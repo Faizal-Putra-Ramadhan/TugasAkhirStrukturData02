@@ -4,15 +4,15 @@
 
 using namespace std;
 
-	const int MAX_BARANG = 100; // Maksimal jumlah jenis barang
-    string nama[MAX_BARANG];
-    int harga[MAX_BARANG] = {0};
-    int stok[MAX_BARANG] = {0}; // Array stok, diinisialisasi 0
-    string penjual[MAX_BARANG];
-    int nomorBarang[MAX_BARANG];
-    int jumlahBarang = 0;      // Jumlah jenis barang yang terdata
-    int jumlahID = 0;
-    string namaBaca;
+const int MAX_BARANG = 100; // Maksimal jumlah jenis barang
+string nama[MAX_BARANG];
+int harga[MAX_BARANG] = {0};
+int stok[MAX_BARANG] = {0}; // Array stok, diinisialisasi 0
+string penjual[MAX_BARANG];
+int nomorBarang[MAX_BARANG];
+int jumlahBarang = 0;      // Jumlah jenis barang yang terdata
+int jumlahID = 0;
+string namaBaca;
 
 
 struct Barang{
@@ -84,10 +84,6 @@ void Penjual::masukanBarang(string namaPenjual) {
 }
 
 
-
-
-
-
 class Pembeli{
 
 	public :
@@ -117,7 +113,7 @@ void Pembeli::beliBarang(string namaPembeli, int pil) {
             for (int i = 0; i < jumlahBarang; i++) {
                 // Menulis data dengan ID dan stok yang tepat
                 for(int j = 0; j<stok[i]; j++){
-                	Rewrite << nama[i] << "," << harga[i] << "," << penjual[j] << "," << j+1 << endl;
+                	Rewrite << nama[i] << "," << harga[i] << "," << penjual[i] << "," << nomorBarang[j] << endl;
 				}
             }
             Rewrite.close();
@@ -260,10 +256,10 @@ ifstream brg("dataBarang.txt");
                 getline(brg, namaBaca, ',');
                 harga[i] = stoi(namaBaca);
                 getline(brg, namaBaca, ',');
-                penjual[stok[i]-1] = namaBaca;
+                penjual[jumlahID++] = namaBaca;
 
                 getline(brg, namaBaca);
-                nomorBarang[jumlahID++] = stoi(namaBaca);
+                nomorBarang[stok[i]-1] = stoi(namaBaca);
                 stok[i]++;
                 break;
             }
