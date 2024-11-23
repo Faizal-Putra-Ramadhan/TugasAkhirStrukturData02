@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 
 using namespace std;
@@ -7,7 +8,8 @@ using namespace std;
     string nama[MAX_BARANG];
     int harga[MAX_BARANG] = {0};
     int stok[MAX_BARANG] = {0}; // Array stok, diinisialisasi 0
-    string id[MAX_BARANG];
+    string penjual[MAX_BARANG];
+    int nomorBarang[MAX_BARANG];
     int jumlahBarang = 0;      // Jumlah jenis barang yang terdata
     int jumlahID = 0;
     string namaBaca;
@@ -28,26 +30,6 @@ class Penjual{
 		int cariIdTerakhir(string namaBarang);
 };
 
-void Penjual::masukanBarang(string nama){
-	cout<<"Masukan nama barang : ";
-	getline(cin,brg.namaBarang);
-	cout<<"Masukan harga : ";
-	cin>>brg.harga;
-	
-	brg.id = cariIdTerakhir(brg.namaBarang) + 1;
-
-    
-    ofstream file("dataBarang.txt", ios::app);
-    if (file.is_open()) {
-        file << brg.namaBarang << "\n"<< brg.harga << " " << nama << endl;
-        file.close();
-        cout << "Barang berhasil ditambahkan" << endl;
-    } else {
-        cout << "Gagal membuka file." << endl;
-    }
-}
-
-
 int Penjual::cariIdTerakhir(string namaBarang) {
     ifstream file("dataBarang.txt");
     string line, nama;
@@ -57,10 +39,13 @@ int Penjual::cariIdTerakhir(string namaBarang) {
     string tempNamaPenjual;
 
      if (file.is_open()) {
-        while (getline(file, nama)) { // Baca nama barang
+        while (getline(file, nama, ',')) { // Baca nama barang
             if (nama == namaBarang) {
+            	getline(file, nama, ',');
+            	getline(file,nama,',');
+            	
                 // Jika nama barang cocok, baca ID, harga, dan nama penjual pada baris berikutnya
-                if (file >> tempId >> tempHarga >> tempNamaPenjual) {
+                if (file>>tempId) {
                     idTerakhir = tempId; // Set id terakhir sesuai dengan id yang ditemukan
                 }
                 // Hapus sisa karakter pada baris berikutnya untuk menghindari konflik saat membaca nama di iterasi berikutnya
@@ -75,6 +60,34 @@ int Penjual::cariIdTerakhir(string namaBarang) {
     return idTerakhir;
 }
 
+
+	
+void Penjual::masukanBarang(string namaPenjual) {
+    cout << "Masukkan nama barang: ";
+    
+    getline(cin, brg.namaBarang);
+    cout << "Masukkan harga: ";
+    cin >> brg.harga;
+
+    // Cari ID terakhir dan tambahkan 1
+    brg.id = cariIdTerakhir(brg.namaBarang) + 1;
+
+    // Simpan ke file
+    ofstream file("dataBarang.txt", ios::app);
+    if (file.is_open()) {
+        file << brg.namaBarang << "," << brg.harga << "," << namaPenjual << "," << brg.id << endl;
+        file.close();
+        cout << "Barang berhasil ditambahkan dengan ID: " << brg.id << endl;
+    } else {
+        cout << "Gagal membuka file untuk menambahkan barang." << endl;
+    }
+}
+
+
+
+
+
+
 class Pembeli{
 
 	public :
@@ -84,86 +97,61 @@ class Pembeli{
 };
 
 
-class CariBarang{
-	private:
-		string* nama;
-		int ukuran;
-		
-	public:
-		CariBarang(int ukuran = 0);
-		
-		CariBarang(const CariBarang& c);
-		CariBarang& operator=(const CariBarang& c);
-		string operator[](int i){return nama[i];};
-};
+void Pembeli::beliBarang(string namaPembeli, int pil) {
+    ofstream DataBeli(namaPembeli + "_barang.txt", ios::app);
+    if (pil - 1 < 0 || pil - 1 >= jumlahBarang) {
+        cout << "Pilihan barang tidak valid!" << endl;
+        return;
+    }
 
-CariBarang::CariBarang(int a){
-	ukuran = a;
-	nama = new string[ukuran];
+    // Cek apakah stok tersedia
+    if (stok[pil - 1] > 0) {
+        // Proses LIFO: Barang terakhir yang masuk akan diambil
+        DataBeli << nama[pil - 1] << " Rp." << harga[pil - 1] << endl;
+        stok[pil - 1]--; // Kurangi stok barang
+        cout << "Barang berhasil dibeli: " << nama[pil - 1] << " Rp." << harga[pil - 1] << endl;
+
+        // Perbarui file dataBarang.txt
+        ofstream Rewrite("dataBarang.txt", ios::trunc);
+        if (Rewrite.is_open()) {
+            for (int i = 0; i < jumlahBarang; i++) {
+                // Menulis data dengan ID dan stok yang tepat
+                for(int j = 0; j<stok[i]; j++){
+                	Rewrite << nama[i] << "," << harga[i] << "," << penjual[j] << "," << j+1 << endl;
+				}
+            }
+            Rewrite.close();
+        } else {
+            cout << "Gagal membuka file untuk menulis ulang." << endl;
+        }
+    } else {
+        cout << "Stok barang habis!" << endl;
+    }
+
+    DataBeli.close();
 }
 
-CariBarang::CariBarang(const CariBarang& c){
-	ukuran = c.ukuran;
-	for(int i = 0; i<ukuran; i++){
-		nama[i] = c.nama[i];
-	}
-}
-
-CariBarang& CariBarang::operator=(const CariBarang& c){
-	if(this != &c){
-		this->ukuran = c.ukuran;
-		delete [] nama;
-		
-		this->nama = new string[ukuran];
-		for(int i = 0; i<ukuran; i++){
-			this->nama[i] = c.nama[i];
-		}
-	}
-	
-	return *this;
-}
-
-void Pembeli::beliBarang(string namaPembeli, int pil){
-	ofstream DataBeli (namaPembeli + "_barang.txt", ios::app);	
-	ofstream Rewrite("dataBarang.txt", ios::trunc);
-	for(int i = 0; i<jumlahBarang; i++){
-		if(pil-1 == i){
-			DataBeli<<nama[i]<<" Rp."<<harga[i]<<endl;
-			stok[i]--;
-		}
-	}
-	for(int i = 0; i<jumlahBarang; i++){
-		
-		for(int j = 0; j<stok[i]; j++){
-			Rewrite<<nama[i]<<"\n"<<harga[i]<<id[j]<<endl;
-		}
-
-	}
-	DataBeli.close();
-	
-	
-}
 
 void Pembeli::cariBarang(string namaBarang){
 	string temp;
 	for(int i = 0; i<jumlahID-1; i++){
 		for(int j = 0; j<jumlahID-i-1; j++){
-			if(id[i] != id[i+1]){ // jika di dalam id terdapat kata dalam kurung yang sama di suatu kalimat berikutnya, maka melakukan argumennya
-			temp = id[i+1];
-			id[i+1] = id[i];
-			id[i] = temp;
+			if(penjual[i] != penjual[i+1]){ // jika di dalam id terdapat kata dalam kurung yang sama di suatu kalimat berikutnya, maka melakukan argumennya
+			temp = penjual[i+1];
+			penjual[i+1] = penjual[i];
+			penjual[i] = temp;
 			
 		}
 		}
 	}
 
 	for(int i = 0; i<jumlahID; i++){
-		cout<<"( "<<id[i]<<" )"<<endl;
+		cout<<"( "<<penjual[i]<<", "<< nomorBarang[i]<< " )"<<endl;
 	}
     // Jika namaBarang kosong, tampilkan semua barang
     if (namaBarang == "" || namaBarang == " ") {
         for (int i = 0; i < jumlahBarang; i++) {
-            cout<<i+1<<". " << nama[i] << ", stok: " << stok[i] << endl;
+            cout<<i+1<<". " << nama[i] << ", stok: " << stok[i] <<" Rp."<< harga[i] << endl;
             
         }
     } else { // Jika namaBarang spesifik, cari dan tampilkan stoknya
@@ -259,34 +247,40 @@ void login(){
 }
 
 int main (){
-	ifstream brg("dataBarang.txt");
-	int i = 0;
+ifstream brg("dataBarang.txt");
+    int i = 0;
 
     // Membaca file dan mengisi array
-    while (getline(brg, namaBaca)) {
-        // Mencari apakah barang sudah ada di array
+    while (getline(brg, namaBaca, ',')) {
         bool ditemukan = false;
         for (int i = 0; i < jumlahBarang; i++) {
             if (nama[i] == namaBaca) {
-                stok[i]++; // Jika ditemukan, tambahkan stok
+                
                 ditemukan = true;
-                brg>>harga[jumlahBarang];
+                getline(brg, namaBaca, ',');
+                harga[i] = stoi(namaBaca);
+                getline(brg, namaBaca, ',');
+                penjual[stok[i]-1] = namaBaca;
+
                 getline(brg, namaBaca);
-        		id[jumlahID++] = namaBaca;
+                nomorBarang[jumlahID++] = stoi(namaBaca);
+                stok[i]++;
                 break;
             }
-            
         }
-        if (!ditemukan) { // Jika tidak ditemukan, tambahkan ke array
+        if (!ditemukan) {
             nama[jumlahBarang] = namaBaca;
             stok[jumlahBarang] = 1;
-            brg>>harga[jumlahBarang];
-            jumlahBarang++;
-            
+
+            getline(brg, namaBaca, ',');
+            harga[jumlahBarang] = stoi(namaBaca);
+
+            getline(brg, namaBaca, ',');
+            penjual[jumlahID++] = namaBaca;
             getline(brg, namaBaca);
-        	id[jumlahID++] = namaBaca;
+            nomorBarang[stok[jumlahBarang]-1] = stoi(namaBaca);
+            jumlahBarang++;
         }
-        
     }
     brg.close();
     
@@ -299,6 +293,6 @@ int main (){
 
 	 Pembeli pbl;
 //	 pbl.cariBarang("");
-	pbl.beliBarang("tes", 2);
+	pbl.beliBarang("tes", 1);
 	return 0;
 }
