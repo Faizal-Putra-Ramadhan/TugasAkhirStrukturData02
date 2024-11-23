@@ -1,10 +1,6 @@
-pop ice
-25000 faisal
-pop ice
-25000 faisal
-pop ice
-25000 faisal
-pop ice
-25000 faisal
-ssgfsg
-3232 faisal
+pop ice,25000,faisal,1
+pop ice,25000,faisal,2
+pop ice,25000,faisal,3
+ssgfsg,3232,faisal,1
+ssgfsg,3232,faisal,2
+st,23,faisal,1
