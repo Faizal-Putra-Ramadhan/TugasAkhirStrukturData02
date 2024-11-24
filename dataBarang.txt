@@ -1,6 +1,13 @@
 pop ice,25000,faisal,1
 pop ice,25000,faisal,2
-pop ice,25000,faisal,3
 ssgfsg,3232,faisal,1
+pop ice,25000,faisal,3
+pop ice,25000,faisal,4
 ssgfsg,3232,faisal,2
 st,23,faisal,1
+st,23,faisal,2
+st,23,faisal,3
+st,23,faisal,4
+pop ice,25000,faisal,5
+st,23,faisal,5
+st,23,faisal,6
