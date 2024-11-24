@@ -259,7 +259,7 @@ ifstream brg("dataBarang.txt");
                 penjual[jumlahID++] = namaBaca;
 
                 getline(brg, namaBaca);
-                nomorBarang[stok[i]-1] = stoi(namaBaca);
+                nomorBarang[stok[i]] = stoi(namaBaca);
                 stok[i]++;
                 break;
             }
