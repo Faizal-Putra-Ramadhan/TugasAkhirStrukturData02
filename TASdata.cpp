@@ -89,13 +89,14 @@ int Penjual::cariIdTerakhir(string namaBarang) {
 	
 void Penjual::masukanBarang(string namaPenjual) {
 	cin.ignore();
-    cout << "Masukkan nama barang: "<<endl;
-	cout<<"------------------------";	
+	cout<<"------------------------"<<endl;	
+    cout << "Masukkan nama barang: ";
+	
     
     getline(cin, brg.namaBarang);
     cout << "Masukkan harga: ";
     cin >> brg.harga;
-	cout<<"------------------------";	
+		
 
     // Cari ID terakhir dan tambahkan 1
     brg.id = cariIdTerakhir(brg.namaBarang) + 1;
@@ -109,6 +110,7 @@ void Penjual::masukanBarang(string namaPenjual) {
     } else {
         cout << "Gagal membuka file untuk menambahkan barang." << endl;
     }
+    cout<<"------------------------"<<endl;
 }
 
 
@@ -335,11 +337,13 @@ int main (){
 	 	cout<<"Pilih pilihan anda : ";
 	 	cin>>pil;
 		cout<<"----------------------------"<<endl;
+		system("cls");
 	 	switch(pil){
 	 		case 1:
 	 			{
 	 				Penjual pjl;
 	 			pjl.masukanBarang("faisal");
+	 			system("pause");
 	 			system("cls");
 	 			break;
 				 }
@@ -349,7 +353,6 @@ int main (){
 	 			pbl.cariBarang("");
 	 			cout<<"Pilih pilihan anda : ";
 	 			cin>>pil1;
-	 			pbl.cariBarang("");
 	 			pbl.beliBarang("tes", pil1);
 	 			cout<<"Program selesai"<<endl;
 				 }
