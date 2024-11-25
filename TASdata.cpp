@@ -3,7 +3,7 @@
 #include <fstream>
 
 using namespace std;
-
+// hai
 const int MAX_BARANG = 100; // Maksimal jumlah jenis barang
 string nama[MAX_BARANG];
 int harga[MAX_BARANG] = {0};
