@@ -2,14 +2,39 @@
 #include <string>
 #include <fstream>
 
+#define MAX_BARANG 100
+
 using namespace std;
 
-const int MAX_BARANG = 100; // Maksimal jumlah jenis barang
-string nama[MAX_BARANG];
-int harga[MAX_BARANG] = {0};
-int stok[MAX_BARANG] = {0}; // Array stok, diinisialisasi 0
-string penjual[MAX_BARANG];
-int nomorBarang[MAX_BARANG];
+template<class T>
+class Penjualan{
+	private:
+		T* array;
+		int ukuran;
+	public:
+		Penjualan<T>(int ukuran = 0);
+		T& operator [] (int i){return array[i];}
+		Penjualan<T>& operator =(T a);
+};
+
+template<class T>
+Penjualan<T>::Penjualan(int a){
+	ukuran = a;
+	array = new T[ukuran];
+}
+
+template<class T>
+Penjualan<T>& Penjualan<T>::operator=(T a){
+	array = a;
+	return *this;
+}
+
+
+Penjualan<string> nama(MAX_BARANG);
+Penjualan<int> harga(MAX_BARANG);
+Penjualan<int> stok(MAX_BARANG) ; // Array stok, diinisialisasi 0
+Penjualan<string> penjual(MAX_BARANG);
+Penjualan<int> nomorBarang(MAX_BARANG);
 int jumlahBarang = 0;      // Jumlah jenis barang yang terdata
 int jumlahID = 0;
 string namaBaca;
@@ -130,20 +155,20 @@ void Pembeli::beliBarang(string namaPembeli, int pil) {
 
 void Pembeli::cariBarang(string namaBarang){
 	string temp;
-	for(int i = 0; i<jumlahID-1; i++){
-		for(int j = 0; j<jumlahID-i-1; j++){
-			if(penjual[i] != penjual[i+1]){ // jika di dalam id terdapat kata dalam kurung yang sama di suatu kalimat berikutnya, maka melakukan argumennya
-			temp = penjual[i+1];
-			penjual[i+1] = penjual[i];
-			penjual[i] = temp;
-			
-		}
-		}
-	}
-
-	for(int i = 0; i<jumlahID; i++){
-		cout<<"( "<<penjual[i]<<", "<< nomorBarang[i]<< " )"<<endl;
-	}
+//	for(int i = 0; i<jumlahID-1; i++){
+//		for(int j = 0; j<jumlahID-i-1; j++){
+//			if(penjual[i] != penjual[i+1]){ // jika di dalam id terdapat kata dalam kurung yang sama di suatu kalimat berikutnya, maka melakukan argumennya
+//			temp = penjual[i+1];
+//			penjual[i+1] = penjual[i];
+//			penjual[i] = temp;
+//			
+//		}
+//		}
+//	}
+//
+//	for(int i = 0; i<jumlahID; i++){
+//		cout<<"( "<<penjual[i]<<", "<< nomorBarang[i]<< " )"<<endl;
+//	}
     // Jika namaBarang kosong, tampilkan semua barang
     if (namaBarang == "" || namaBarang == " ") {
         for (int i = 0; i < jumlahBarang; i++) {
@@ -154,7 +179,7 @@ void Pembeli::cariBarang(string namaBarang){
         bool ditemukan = false;
         for (int i = 0; i < jumlahBarang; i++) {
             if (nama[i] == namaBarang) {
-                cout<<i+1<<". " << nama[i] << ", stok: " << stok[i] << endl;
+                cout<<i+1<<". " << nama[i] << ", stok: " << stok[i] <<" Rp."<< harga[i] << endl;
                 ditemukan = true;
                 break;
             }
@@ -243,6 +268,12 @@ void login(){
 }
 
 int main (){
+	for(int i = 0; i<MAX_BARANG; i++){
+		harga[i] = 0;
+	}
+	for(int i = 0; i<MAX_BARANG; i++){
+		stok[i] = 0;
+	}
 ifstream brg("dataBarang.txt");
     int i = 0;
 
@@ -288,7 +319,7 @@ ifstream brg("dataBarang.txt");
 //	pjl.masukanBarang("faisal");
 
 	 Pembeli pbl;
-//	 pbl.cariBarang("");
+//	 pbl.cariBarang("  ");
 	pbl.beliBarang("tes", 1);
 	return 0;
 }
