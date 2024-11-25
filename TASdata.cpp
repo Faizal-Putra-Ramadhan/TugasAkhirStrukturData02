@@ -89,11 +89,13 @@ int Penjual::cariIdTerakhir(string namaBarang) {
 	
 void Penjual::masukanBarang(string namaPenjual) {
 	cin.ignore();
-    cout << "Masukkan nama barang: ";
+    cout << "Masukkan nama barang: "<<endl;
+	cout<<"------------------------";	
     
     getline(cin, brg.namaBarang);
     cout << "Masukkan harga: ";
     cin >> brg.harga;
+	cout<<"------------------------";	
 
     // Cari ID terakhir dan tambahkan 1
     brg.id = cariIdTerakhir(brg.namaBarang) + 1;
@@ -185,7 +187,7 @@ void Pembeli::cariBarang(string namaBarang){
                 break;
             }
         }
-        if (!ditemukan) {
+        if (!ditemukan) {	
             cout << "Barang tidak ada." << endl;
         }
     }
@@ -325,7 +327,7 @@ int main (){
 		
 	 	system("cls"); // digunakan untuk memberishkan layar
 		cout<<"============================"<<endl;
-	 	cout<<"\n===Sistem Penjualan===\n";
+	 	cout<<"\nSistem Penjualan\n"<<endl;
 		cout<<"1. Tambah Barang"<<endl;
 		cout<<"2. Beli barang"<<endl;
 		int pil;
