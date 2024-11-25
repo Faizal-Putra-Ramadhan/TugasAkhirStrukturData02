@@ -14,7 +14,7 @@ class Penjualan{
 	public:
 		Penjualan<T>(int ukuran = 0);
 		T& operator [] (int i){return array[i];}
-		Penjualan<T>& operator =(T a);
+		Penjualan<T>& operator =(T& a);
 };
 
 template<class T>
@@ -24,7 +24,7 @@ Penjualan<T>::Penjualan(int a){
 }
 
 template<class T>
-Penjualan<T>& Penjualan<T>::operator=(T a){
+Penjualan<T>& Penjualan<T>::operator=(T& a){
 	array = a;
 	return *this;
 }
@@ -88,6 +88,7 @@ int Penjual::cariIdTerakhir(string namaBarang) {
 
 	
 void Penjual::masukanBarang(string namaPenjual) {
+	cin.ignore();
     cout << "Masukkan nama barang: ";
     
     getline(cin, brg.namaBarang);
@@ -268,48 +269,7 @@ void login(){
 }
 
 int main (){
-	for(int i = 0; i<MAX_BARANG; i++){
-		harga[i] = 0;
-	}
-	for(int i = 0; i<MAX_BARANG; i++){
-		stok[i] = 0;
-	}
-ifstream brg("dataBarang.txt");
-    int i = 0;
-
-    // Membaca file dan mengisi array
-    while (getline(brg, namaBaca, ',')) {
-        bool ditemukan = false;
-        for (int i = 0; i < jumlahBarang; i++) {
-            if (nama[i] == namaBaca) {
-                
-                ditemukan = true;
-                getline(brg, namaBaca, ',');
-                harga[i] = stoi(namaBaca);
-                getline(brg, namaBaca, ',');
-                penjual[jumlahID++] = namaBaca;
-
-                getline(brg, namaBaca);
-                nomorBarang[stok[i]] = stoi(namaBaca);
-                stok[i]++;
-                break;
-            }
-        }
-        if (!ditemukan) {
-            nama[jumlahBarang] = namaBaca;
-            stok[jumlahBarang] = 1;
-
-            getline(brg, namaBaca, ',');
-            harga[jumlahBarang] = stoi(namaBaca);
-
-            getline(brg, namaBaca, ',');
-            penjual[jumlahID++] = namaBaca;
-            getline(brg, namaBaca);
-            nomorBarang[stok[jumlahBarang]-1] = stoi(namaBaca);
-            jumlahBarang++;
-        }
-    }
-    brg.close();
+	
     
     
 //	daftar();
@@ -317,9 +277,81 @@ ifstream brg("dataBarang.txt");
 	
 //	Penjual pjl;
 //	pjl.masukanBarang("faisal");
+	int pil1;
+	while(true){
+		
+		for(int i = 0; i<MAX_BARANG; i++){
+			harga[i] = 0;
+		}
+		for(int i = 0; i<MAX_BARANG; i++){
+			stok[i] = 0;
+		}
+		ifstream brg("dataBarang.txt");
+    	int i = 0;
 
-	 Pembeli pbl;
-//	 pbl.cariBarang("  ");
-	pbl.beliBarang("tes", 1);
+    	// Membaca file dan mengisi array
+    	while (getline(brg, namaBaca, ',')) {
+        	bool ditemukan = false;
+        	for (int i = 0; i < jumlahBarang; i++) {
+            	if (nama[i] == namaBaca) {
+                
+               		ditemukan = true;
+                	getline(brg, namaBaca, ',');
+                	harga[i] = stoi(namaBaca);
+                	getline(brg, namaBaca, ',');
+                	penjual[jumlahID++] = namaBaca;
+
+                	getline(brg, namaBaca);
+                	nomorBarang[stok[i]] = stoi(namaBaca);
+                	stok[i]++;
+                	break;
+            	}
+        	}
+        	if (!ditemukan) {
+            	nama[jumlahBarang] = namaBaca;
+            	stok[jumlahBarang] = 1;
+
+            	getline(brg, namaBaca, ',');
+            	harga[jumlahBarang] = stoi(namaBaca);
+
+            	getline(brg, namaBaca, ',');
+            	penjual[jumlahID++] = namaBaca;
+            	getline(brg, namaBaca);
+            	nomorBarang[stok[jumlahBarang]-1] = stoi(namaBaca);
+            	jumlahBarang++;
+        	}
+    	}
+    	brg.close();
+		
+	 
+		cout<<"1. Tambah Barang"<<endl;
+		cout<<"2. Beli barang"<<endl;
+		int pil;
+	 	cout<<"Pilih pilihan anda : ";
+	 	cin>>pil;
+	 	switch(pil){
+	 		case 1:
+	 			{
+	 				Penjual pjl;
+	 			pjl.masukanBarang("faisal");
+	 			system("cls");
+	 			break;
+				 }
+	 		case 2:
+	 			{
+	 			Pembeli pbl;
+	 			pbl.cariBarang("");
+	 			cout<<"Pilih pilihan anda : ";
+	 			cin>>pil1;
+	 			pbl.cariBarang("");
+	 			pbl.beliBarang("tes", pil1);
+	 			cout<<"Program selesai"<<endl;
+				 }
+	 			return 0;
+		 }
+		
+	}
+
+	 
 	return 0;
 }
