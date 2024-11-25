@@ -323,12 +323,16 @@ int main (){
     	}
     	brg.close();
 		
-	 
+	 	system("cls"); // digunakan untuk memberishkan layar
+		cout<<"============================"<<endl;
+	 	cout<<"\n===Sistem Penjualan===\n";
 		cout<<"1. Tambah Barang"<<endl;
 		cout<<"2. Beli barang"<<endl;
 		int pil;
+		cout<<"============================"<<endl;
 	 	cout<<"Pilih pilihan anda : ";
 	 	cin>>pil;
+		cout<<"----------------------------"<<endl;
 	 	switch(pil){
 	 		case 1:
 	 			{
