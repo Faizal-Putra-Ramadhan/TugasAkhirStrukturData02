@@ -17,6 +17,8 @@ class Penjualan{
 		Penjualan<T>& operator =(T a);
 };
 
+
+
 template<class T>
 Penjualan<T>::Penjualan(int a){
 	ukuran = a;
@@ -53,21 +55,23 @@ class Penjual{
 		void masukanBarang(string nama);
 		void kirimBarang();
 		int cariIdTerakhir(string namaBarang);
+        void terimaRefund(string);
 };
+
+
 
 int Penjual::cariIdTerakhir(string namaBarang) {
     ifstream file("dataBarang.txt");
-    string line, nama;
+    string line, nama1;
     int idTerakhir = 0;
     int tempId;
-    long long tempHarga;
     string tempNamaPenjual;
 
      if (file.is_open()) {
-        while (getline(file, nama, ',')) { // Baca nama barang
-            if (nama == namaBarang) {
-            	getline(file, nama, ',');
-            	getline(file,nama,',');
+        while (getline(file, nama1, ',')) { // Baca nama barang
+            if (nama1 == namaBarang) {
+            	getline(file, nama1, ',');
+            	getline(file,nama1,',');
             	
                 // Jika nama barang cocok, baca ID, harga, dan nama penjual pada baris berikutnya
                 if (file>>tempId) {
@@ -108,18 +112,116 @@ void Penjual::masukanBarang(string namaPenjual) {
     }
 }
 
+void Penjual::terimaRefund(string namaPenjual){
+    ifstream brg ("Refund/" + namaPenjual + "_refund.txt");
+    string namaProduk[MAX_BARANG],namaPembeli[MAX_BARANG];
+    int hargaProduk[MAX_BARANG];
+    int jml = 0;
+    while(getline(brg,namaBaca,',')){
+        namaProduk[jml] = namaBaca;
+        getline(brg,namaBaca,',');
+        hargaProduk[jml] = stoi(namaBaca);
+        getline(brg,namaBaca);
+        namaPembeli[jml] = namaBaca;
+        jml++;
+    }
+    brg.close();
+
+    cout<<"1. Produk : "<<namaProduk[0]<<", harga : "<<hargaProduk[0]<<", Pembeli : "<<namaPembeli[0]<<endl;
+    if(jml-1 != 0){
+        cout<<"dan "<<jml-1<<" lainnya...\n";
+    }
+
+    char pil;
+    cout<<"terima refund (y/n) ? : ";
+    cin>>pil;
+
+    if(pil == 'y' or 'Y'){
+        for(int i = 0; i<jml-1; i++){
+                namaProduk[i] = namaProduk[i+1];
+                namaPembeli[i] = namaPembeli[i+1];
+                hargaProduk[i] = hargaProduk[i+1];
+        }
+        jml--;
+        ofstream brg1 ("Refund/" + namaPenjual + "_refund.txt", ios::trunc);
+        cout<<"Barang berhasil di refund!!"<<endl;
+        for(int i = 0; i<jml; i++){
+            brg1<<namaProduk[i]<<","<<hargaProduk[i]<<","<<namaPembeli[i]<<endl;
+        }
+        brg1.close();
+    }else {
+        cout<<"Produk tidak di refund!"<<endl;
+    }
+
+}
+
 
 class Pembeli{
 
 	public :
 		void cariBarang(string namaBarang);	
 		void beliBarang(string, int );	
+        void Refund(string);
+        void Checkout(string);
 		
 };
+
+void Pembeli::Checkout(string namaPembeli){
+    ifstream brg(namaPembeli + "_barang.txt");
+    string namaProduk[100];
+    string harga1[100];
+    string namaPenjual[100];
+
+    int jml = 0;
+    while (getline(brg,namaBaca, ',')){
+        namaProduk[jml] = namaBaca;
+        getline(brg,namaBaca,',');
+        harga1[jml] = namaBaca;
+        getline(brg,namaBaca);
+        namaPenjual[jml] = namaBaca;
+        jml++;
+    }
+    brg.close();
+
+    
+    
+
+    for(int j = 0; j<jml; j++){
+        cout<<j+1<<". "<<namaProduk[j]<<", Rp."<<harga1[j]<<endl;
+    }
+
+    cout<<"Checkout Barang (y/n) ? : ";
+    char pil;
+    cin>>pil;
+    
+    if(pil == 'y' or pil == 'Y'){
+        
+        for (int cek = 0; cek < jml; cek++) {
+            if (namaPenjual[cek] != "") { 
+                
+                ofstream brg1("Kirim/" + namaPenjual[cek] + "_kirim.txt", ios::app);
+                for (int i = 0; i < jml; i++) {
+                    if (namaPenjual[i] == namaPenjual[cek]) {
+                        brg1 << namaProduk[i] << "," << harga1[i] << "," << namaPembeli << endl;
+                        namaPenjual[i] = "";
+                    }
+                }
+                brg1.close();
+            }
+        }
+        
+        
+        cout<<"barang berhasil dibeli"<<endl;
+    }else {
+        cout<<"Barang tidak dibeli"<<endl;
+    }
+
+}
 
 
 void Pembeli::beliBarang(string namaPembeli, int pil) {
     ofstream DataBeli(namaPembeli + "_barang.txt", ios::app);
+    
     if (pil - 1 < 0 || pil - 1 >= jumlahBarang) {
         cout << "Pilihan barang tidak valid!" << endl;
         return;
@@ -128,7 +230,7 @@ void Pembeli::beliBarang(string namaPembeli, int pil) {
     // Cek apakah stok tersedia
     if (stok[pil - 1] > 0) {
         // Proses LIFO: Barang terakhir yang masuk akan diambil
-        DataBeli << nama[pil - 1] << " Rp." << harga[pil - 1] << endl;
+        DataBeli << nama[pil - 1] << "," << harga[pil - 1]<<","<<penjual[pil-1]<< endl;
         stok[pil - 1]--; // Kurangi stok barang
         cout << "Barang berhasil dibeli: " << nama[pil - 1] << " Rp." << harga[pil - 1] << endl;
 
@@ -154,7 +256,7 @@ void Pembeli::beliBarang(string namaPembeli, int pil) {
 
 
 void Pembeli::cariBarang(string namaBarang){
-	string temp;
+
 //	for(int i = 0; i<jumlahID-1; i++){
 //		for(int j = 0; j<jumlahID-i-1; j++){
 //			if(penjual[i] != penjual[i+1]){ // jika di dalam id terdapat kata dalam kurung yang sama di suatu kalimat berikutnya, maka melakukan argumennya
@@ -190,13 +292,59 @@ void Pembeli::cariBarang(string namaBarang){
     }
 }
 
+void Pembeli::Refund(string namaPembeli){
+    ifstream brg(namaPembeli + "_barang.txt");
+    string namaProduk[100];
+    string harga1[100];
+    string namaPenjual[100];
+
+    int i = 0;
+    while (getline(brg,namaBaca, ',')){
+        namaProduk[i] = namaBaca;
+        getline(brg,namaBaca,',');
+        harga1[i] = namaBaca;
+        getline(brg,namaBaca);
+        namaPenjual[i] = namaBaca;
+        i++;
+    }
+    brg.close();
+
+    ofstream Rewrite(namaPembeli + "_barang.txt", ios::trunc);
+    
+
+    for(int j = 0; j<i; j++){
+        cout<<j+1<<". "<<namaProduk[j]<<", Rp."<<harga1[j]<<endl;
+    }
+
+    cout<<"Masukan pilihan barang yang ingin di refund : ";
+    int pil;
+    cin>>pil;
+    if(pil-1 < 0  ||  pil-1 >= i){
+        cout<<"Pilihan tidak valid!"<<endl;
+    }else {
+        for(int j = 0; j<i; j++){
+            if(pil-1 != j){
+                Rewrite<<namaProduk[j]<<","<<harga1[j]<<","<<namaPenjual[j]<<endl;
+            }
+        }
+        ofstream tulisRefund("Refund/" + namaPenjual[pil-1] + "_refund.txt", ios::app);
+        tulisRefund << namaProduk[pil-1] << "," << harga1[pil-1] << "," << namaPembeli << endl;
+        tulisRefund.close();
+        cout<<"Refund barang akan diproses"<<endl;
+        
+    }
+    Rewrite.close();
+
+    
+}
+
 void daftar(){
-	string Cnama, nama, pass;
+	string Cnama, nama1, pass1;
 	
 	cout<<"Masukan nama : ";
-	getline(cin,nama);
+	getline(cin,nama1);
 	cout<<"Masukan pass : ";
-	cin>>pass;
+	cin>>pass1;
 	
 	ofstream Dakun;
 	Dakun.open("akun.txt",ios::app); // inputan akan membuat dan masuk ke dalam file akun.txt
@@ -204,22 +352,22 @@ void daftar(){
 	ifstream Cakun("akun.txt");
 	while(!Cakun.eof()){
 		getline(Cakun,Cnama);
-		if(nama == Cnama){
+		if(nama1 == Cnama){
 			cout<<"username sudah ada, silahkan cari username lain"<<endl;
 			return;
 		}
 	}
 	Cakun.close();
 	
-	Dakun<<nama<<endl; // file akun.txt hanya akan berisi username dari inputan
+	Dakun<<nama1<<endl; // file akun.txt hanya akan berisi username dari inputan
 	Dakun.close();
 	
 	
 	
 	ofstream akun;
-	akun.open(nama + ".txt", ios::app); // setiap user atau username memiliki file txt masing masing
-	akun<<nama<<endl;
-	akun<<pass<<endl;
+	akun.open(nama1 + ".txt", ios::app); // setiap user atau username memiliki file txt masing masing
+	akun<<nama1<<endl;
+	akun<<pass1<<endl;
 	akun<<0<<endl;
 	akun.close();
 
@@ -228,13 +376,13 @@ void daftar(){
 
 
 void login(){
-	string Tnama, nama, pass, Tpass;
+	string Tnama, nama1, pass1, Tpass;
 	
 	cout<<"Masukan nama : ";
-	getline(cin,nama);
+	getline(cin,nama1);
 
 	cout<<"Masukan pass : ";
-	cin>>pass;
+	cin>>pass1;
 	
 	ifstream Dakun;
 	Dakun.open("akun.txt");
@@ -242,7 +390,7 @@ void login(){
 	while(!Dakun.eof() and cek == false){
 		
 		getline(Dakun,Tnama);
-		if(Tnama == nama){
+		if(Tnama == nama1){
 			cek = true;
 		}
 	}
@@ -251,12 +399,12 @@ void login(){
 	
 	
 	if(cek){
-		Dakun.open(nama + ".txt");
+		Dakun.open(nama1 + ".txt");
 			getline(Dakun,Tpass);
 			getline(Dakun,Tpass);
 		cout<<Tpass<<endl;
 		
-		if(Tpass == pass){
+		if(Tpass == pass1){
 			cout<<"Password anda Benar"<<endl;
 		}else {
 			cout<<"Password anda salah"<<endl;
@@ -267,6 +415,8 @@ void login(){
 	
 }
 
+
+
 int main (){
 	for(int i = 0; i<MAX_BARANG; i++){
 		harga[i] = 0;
@@ -274,8 +424,7 @@ int main (){
 	for(int i = 0; i<MAX_BARANG; i++){
 		stok[i] = 0;
 	}
-ifstream brg("dataBarang.txt");
-    int i = 0;
+    ifstream brg("dataBarang.txt");
 
     // Membaca file dan mengisi array
     while (getline(brg, namaBaca, ',')) {
@@ -319,7 +468,11 @@ ifstream brg("dataBarang.txt");
 //	pjl.masukanBarang("faisal");
 
 	 Pembeli pbl;
-//	 pbl.cariBarang("  ");
-	pbl.beliBarang("tes", 1);
+	//  pbl.cariBarang("  ");
+	// pbl.beliBarang("tes", 3);
+//    pbl.Refund("tes");
+	// Penjual pjl;
+	// pjl.terimaRefund("faisal");
+    pbl.Checkout("tes");
 	return 0;
 }
