@@ -53,7 +53,7 @@ class Penjual{
 		Barang brg;
 	public:
 		void masukanBarang(string nama);
-		void kirimBarang();
+		void kirimBarang(string namaPenjual);
 		int cariIdTerakhir(string namaBarang);
         void terimaRefund(string);
 };
@@ -153,6 +153,48 @@ void Penjual::terimaRefund(string namaPenjual){
         cout<<"Produk tidak di refund!"<<endl;
     }
 
+}
+
+void Penjual::kirimBarang(string namaPenjual){
+       ifstream brg ("Kirim/" + namaPenjual + "_kirim.txt");
+    string namaProduk[MAX_BARANG],namaPembeli[MAX_BARANG];
+    int hargaProduk[MAX_BARANG];
+    int jml = 0;
+    while(getline(brg,namaBaca,',')){
+        namaProduk[jml] = namaBaca;
+        getline(brg,namaBaca,',');
+        hargaProduk[jml] = stoi(namaBaca);
+        getline(brg,namaBaca);
+        namaPembeli[jml] = namaBaca;
+        jml++;
+    }
+    brg.close();
+
+    cout<<"1. Produk : "<<namaProduk[0]<<", harga : "<<hargaProduk[0]<<", Pembeli : "<<namaPembeli[0]<<endl;
+    if(jml-1 != 0){
+        cout<<"dan "<<jml-1<<" lainnya...\n";
+    }
+
+    char pil;
+    cout<<"Kirim Barang? (y/n) ? : ";
+    cin>>pil;
+
+    if(pil == 'y' or 'Y'){
+        for(int i = 0; i<jml-1; i++){
+                namaProduk[i] = namaProduk[i+1];
+                namaPembeli[i] = namaPembeli[i+1];
+                hargaProduk[i] = hargaProduk[i+1];
+        }
+        jml--;
+        ofstream brg1 ("Kirim/" + namaPenjual + "_kirim.txt", ios::trunc);
+        cout<<"Barang telah di kirim!!"<<endl;
+        for(int i = 0; i<jml; i++){
+            brg1<<namaProduk[i]<<","<<hargaProduk[i]<<","<<namaPembeli[i]<<endl;
+        }
+        brg1.close();
+    }else {
+        cout<<"barang tidak di kirim!"<<endl;
+    }
 }
 
 
@@ -471,8 +513,9 @@ int main (){
 	//  pbl.cariBarang("  ");
 	// pbl.beliBarang("tes", 3);
 //    pbl.Refund("tes");
-	// Penjual pjl;
+	 Penjual pjl;
+     pjl.kirimBarang("ttt");
 	// pjl.terimaRefund("faisal");
-    pbl.Checkout("tes");
+    // pbl.Checkout("tes");
 	return 0;
 }
