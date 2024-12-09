@@ -1,0 +1,69 @@
+import cv2
+import matplotlib.pyplot as plt
+
+imagePath = 'image.jpg'
+img = cv2.imread(imagePath)
+
+gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+modelFile = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+face_classifier = cv2.CascadeClassifier(modelFile)
+
+faces = face_classifier.detectMultiScale(
+    gray_image, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40)
+)
+
+for(x, y, w, h) in faces:
+    cv2.rectangle(img, (x,y), (x + w, y + h), (0, 255, 0), 4)
+
+img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+plt.figure(figsize=(20, 10))
+plt.imshow(img)
+plt.axis('off')
+plt.show()
+
+## Pengenalan Wajah Dengan Kamera
+
+import cv2
+import numpy as np
+
+model_file = "deploy.prototxt"
+weights_file = "res10_300x300_ssd_iter_140000.caffemodel"
+face_net = cv2.dnn.readNetFromCaffe(model_file, weights_file)
+
+video_capture = cv2.VideoCapture(0)
+
+def detect(frame):
+    (h, w) = frame.shape[:2]
+
+    blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), (104.0, 177.0, 123.0))
+    face_net.setInput(blob)
+
+    detections = face_net.forward()
+
+    for i in range(0, detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+
+        if confidence > 0.5:
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (x_start, y_start, x_end, y_end) = box.astype("int")
+
+            cv2.rectangle(frame, (x_start, y_start), (x_end, y_end), (0, 255, 0), 2)
+    return frame
+
+while True:
+    result, video_frame = video_capture.read()
+
+    if not result:
+        break
+
+    video_frame = detect(video_frame)
+
+    cv2.imshow("Real-Time Face Detection with Confidence Score", video_frame)
+
+    if cv2.waitKey(1) & 0xFF == ord("q") or cv2.getWindowProperty("Real-Time Face Detection with Confidence Score", cv2.WND_PROP_VISIBLE) < 1:
+        break
+
+video_capture.release()
+cv2.destroyAllWindows()

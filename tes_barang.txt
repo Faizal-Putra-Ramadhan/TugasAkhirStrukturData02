@@ -1,6 +1,4 @@
+st,23,faisal
 pop ice,25000,faisal
-ssgfsg,3232,faisal
-gsrg,23,ttt
-xac,23,ttt
-wrere,23,ttt
-wqq,23,ttt
+
+st,23,faisal

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <chrono>
+#include <iomanip>
 
 #define MAX_BARANG 100
 
@@ -54,14 +56,14 @@ class Penjual{
 	public:
 		void masukanBarang(string nama);
 		void kirimBarang(string namaPenjual);
-		int cariIdTerakhir(string namaBarang);
+		int cariIdTerakhir(string namaBarang, string data);
         void terimaRefund(string);
 };
 
 
 
-int Penjual::cariIdTerakhir(string namaBarang) {
-    ifstream file("dataBarang.txt");
+int Penjual::cariIdTerakhir(string namaBarang, string data) {
+    ifstream file(data);
     string line, nama1;
     int idTerakhir = 0;
     int tempId;
@@ -99,7 +101,7 @@ void Penjual::masukanBarang(string namaPenjual) {
     cin >> brg.harga;
 
     // Cari ID terakhir dan tambahkan 1
-    brg.id = cariIdTerakhir(brg.namaBarang) + 1;
+    brg.id = cariIdTerakhir(brg.namaBarang,"dataBarang.txt") + 1;
 
     // Simpan ke file
     ofstream file("dataBarang.txt", ios::app);
@@ -156,7 +158,15 @@ void Penjual::terimaRefund(string namaPenjual){
 }
 
 void Penjual::kirimBarang(string namaPenjual){
-       ifstream brg ("Kirim/" + namaPenjual + "_kirim.txt");
+	ifstream antrian1("Antrian/antrian.txt");
+	string temp[MAX_BARANG];
+	int no = 0;
+	while(getline(antrian1,temp[no])){
+		no++;
+	}
+	
+	
+    ifstream brg ("Kirim/" + namaPenjual + "_kirim.txt");
     string namaProduk[MAX_BARANG],namaPembeli[MAX_BARANG];
     int hargaProduk[MAX_BARANG];
     int jml = 0;
@@ -186,12 +196,23 @@ void Penjual::kirimBarang(string namaPenjual){
                 hargaProduk[i] = hargaProduk[i+1];
         }
         jml--;
+        
         ofstream brg1 ("Kirim/" + namaPenjual + "_kirim.txt", ios::trunc);
         cout<<"Barang telah di kirim!!"<<endl;
         for(int i = 0; i<jml; i++){
             brg1<<namaProduk[i]<<","<<hargaProduk[i]<<","<<namaPembeli[i]<<endl;
         }
         brg1.close();
+        
+        for(int i = 0; i<no-1; i++){
+        	temp[i] = temp[i+1];
+		}
+		no--;
+        
+        ofstream antrian("Antrian/antrian.txt", ios::trunc);
+        for(int i = 0; i<no; i++){
+        	antrian<<temp[i]<<endl;
+		}
     }else {
         cout<<"barang tidak di kirim!"<<endl;
     }
@@ -205,10 +226,54 @@ class Pembeli{
 		void beliBarang(string, int );	
         void Refund(string);
         void Checkout(string);
+        void lihatAntrian(string);
 		
 };
 
+void Pembeli::lihatAntrian(string namaPembeli){
+	int antri;
+	string temp;
+	int nomor = 1;
+	ifstream antrian("Antrian/antrian.txt");
+	while(getline(antrian,temp,',')){
+		if(temp == namaPembeli){
+			getline(antrian,temp,',');
+			cout<<nomor<<". Pembelian tanggal : "<<temp<<", nomor antrian : ";
+			getline(antrian,temp);
+			cout<<temp<<endl;
+			
+			nomor++;
+		}
+	}
+}
+
 void Pembeli::Checkout(string namaPembeli){
+	auto now = chrono::system_clock::now();
+
+    // Convert to time_t for easy human-readable formatting
+    time_t now_time_t = chrono::system_clock::to_time_t(now);
+    
+    string bulan[12] = {"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"};
+
+    
+	int antri = 1;
+	string temp;
+	ifstream antrian("Antrian/antrian.txt");
+	while(getline(antrian,temp,',')){
+		getline(antrian,temp,',');
+		getline(antrian,temp);
+		antri = antri + stoi(temp);
+	}
+	antrian.close();
+	
+	ofstream antrian1("Antrian/antrian.txt",ios::app);
+	tm* local_time = localtime(&now_time_t);
+    int month_index = local_time->tm_mon; 
+    string tempBulan = bulan[month_index];
+	antrian1<<namaPembeli<<","<<put_time(localtime(&now_time_t),"%d ")<<tempBulan<<put_time(localtime(&now_time_t), " %Y ")<<put_time(localtime(&now_time_t),"Jam : %H.%M")<<","<<antri<<endl;
+	antrian1.close();
+	
+	
     ifstream brg(namaPembeli + "_barang.txt");
     string namaProduk[100];
     string harga1[100];
@@ -254,9 +319,12 @@ void Pembeli::Checkout(string namaPembeli){
         
         
         cout<<"barang berhasil dibeli"<<endl;
+        cout<<"Nomor antrian anda : "<<antri<<endl;
     }else {
         cout<<"Barang tidak dibeli"<<endl;
     }
+    
+    
 
 }
 
@@ -501,21 +569,79 @@ int main (){
         }
     }
     brg.close();
-    
-    
-//	daftar();
-//	login();
-	
-//	Penjual pjl;
-//	pjl.masukanBarang("faisal");
+    system("cls"); // digunakan untuk memberishkan layar
+		cout<<"============================"<<endl;
+	 	cout<<"\nSistem Penjualan\n"<<endl;
+		cout<<"1. Penjual"<<endl;
+		cout<<"2. Pembeli"<<endl;
+		int pil;
+		cout<<"============================"<<endl;
+	 	cout<<"Pilih pilihan anda : ";
+	 	cin>>pil;
+		cout<<"----------------------------"<<endl;
+		system("cls");
+	 	switch(pil){
+	 		case 1:
+	 			{
+	 				Penjual pjl;
+	 			cout<<"1. Tambah Barang"<<endl;
+                cout<<"2. Kirim Barang"<<endl;
+                cout<<"3. Terima Refund"<<endl;
+                int pil1;
+                cout<<"Pilih pilihan anda : ";
+                cin>>pil1;
+                switch(pil1){
+                    case 1:
+                        pjl.masukanBarang("faisal");
+                        break;
+                    case 2:
+                        pjl.kirimBarang("faisal");
+                        break;
+                    case 3:
+                        pjl.terimaRefund("faisal");
+                        break;
 
-	 Pembeli pbl;
-	//  pbl.cariBarang("  ");
-	// pbl.beliBarang("tes", 3);
-//    pbl.Refund("tes");
-	 Penjual pjl;
-     pjl.kirimBarang("ttt");
-	// pjl.terimaRefund("faisal");
-    // pbl.Checkout("tes");
+                }
+	 			system("pause");
+	 			system("cls");
+	 			break;
+				 }
+	 		case 2:
+	 			{
+	 			Pembeli pbl;
+	 		    cout<<"1. Beli Barang"<<endl;
+                cout<<"2. Checkout"<<endl;
+                cout<<"3. Refund"<<endl;
+                cout<<"4. Lihat Antrian anda"<<endl;
+	 			cout<<"Pilih pilihan anda : ";
+                int pil1;
+	 			cin>>pil1;
+                switch(pil1){
+                    case 1:
+                        {
+                            pbl.cariBarang("");
+                        int pil2;
+                        cout<<"Pilih pilihan anda : ";
+                        cin>>pil2;
+                        pbl.beliBarang("tes", pil2);
+                        break;
+                        }
+                    case 2:
+                        pbl.Checkout("tes");
+                        break;
+                    case 3:
+                        pbl.Refund("tes");
+                        break;
+                    case 4:
+                        pbl.lihatAntrian("tes");
+                        break;
+                }
+	 			
+	 			cout<<"Program selesai"<<endl;
+				 }
+	 			return 0;
+		 }
+		
+	
 	return 0;
 }
