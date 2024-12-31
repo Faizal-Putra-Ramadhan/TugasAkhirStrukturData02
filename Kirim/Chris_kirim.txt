@@ -1,0 +1,5 @@
+VGA,30000,wahyu
+Dynamixel AX-18A,70000,coba
+Processor,70000,coba
+Processor,70000,coba
+VGA,30000,coba

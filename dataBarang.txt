@@ -1,4 +1,2 @@
-ssgfsg,3232,faisal,1
-st,23,faisal,1
-st,23,faisal,2
-st,23,faisal,3
+VGA,30000,Chris,1
+Processor,70000,Chris,1

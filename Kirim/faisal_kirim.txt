@@ -1,7 +1,10 @@
-pop ice,25000,tes
-
-st,23,tes
-st,23,tes
-pop ice,25000,tes
-
-st,23,tes
+VGA,7000000,tes
+Processor,3000000,tes
+VGA,7000000,tes
+Processor,3000000,tes
+Processor,3000000,tes
+Servo sg-90,35000,tes
+Dynamixel AX-18A,70000,tes
+VGA,5000000,sam
+Processor,3000000,sam
+VGA,5000000,sam

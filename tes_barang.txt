@@ -1,4 +1,3 @@
-st,23,faisal
-pop ice,25000,faisal
-
-st,23,faisal
+Servo sg-90,35000,Chris
+Dynamixel AX-18A,70000,Chris
+Servo sg-90,35000,Chris

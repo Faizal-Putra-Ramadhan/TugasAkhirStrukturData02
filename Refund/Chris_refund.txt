@@ -1,0 +1,2 @@
+Processor,70000,coba
+Dynamixel AX-18A,70000,coba
